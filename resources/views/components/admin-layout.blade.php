@@ -14,6 +14,15 @@
 
         <!-- jsvectormap css -->
         <link href="assets/libs/jsvectormap/css/jsvectormap.min.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="{{ URL::asset('assets/libs/filepond/filepond.min.css') }}" type="text/css" />
+        <link rel="stylesheet" href="{{ URL::asset('assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css') }}">
+        
+<!-- filepond js -->
+<script src="{{ URL::asset('assets/libs/filepond/filepond.min.js') }}"></script>
+<script src="{{ URL::asset('assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js') }}"></script>
+<script src="{{ URL::asset('assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js') }}"></script>
+<script src="{{ URL::asset('assets/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}"></script>
+<script src="{{ URL::asset('assets/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
 
         <!--Swiper slider css-->
         <link href="assets/libs/swiper/swiper-bundle.min.css" rel="stylesheet" type="text/css" />
@@ -857,7 +866,7 @@
 
         <!-- apexcharts -->
         <script src="assets/libs/apexcharts/apexcharts.min.js"></script>
-
+        <script src="{{ URL::asset('assets/js/pages/form-file-upload.init.js') }}"></script>
         <!-- Vector map-->
         <script src="assets/libs/jsvectormap/js/jsvectormap.min.js"></script>
         <script src="assets/libs/jsvectormap/maps/world-merc.js"></script>

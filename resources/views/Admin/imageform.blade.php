@@ -60,7 +60,7 @@
                                             {{ session()->get('error') }}
                                         </div>
                                     @endif
-                                     <form enctype="multipart/form-data" id="validate-me-plz" action="{{ route('admin.image.store') }}"
+                                     <form enctype="multipart/form-data" id="addForm" action="{{ route('admin.image.store') }}"
                                             method="POST" id="main_form">
                                             @csrf
                                             <div class="row">
@@ -84,13 +84,13 @@
                                                         @enderror
                                                     </div>
                                                 </div>
-                                                  
+                                              
 
                                                 <div class="col-md-6">
                                                     <div class="form-group mb-3">
                                                         <label class="control-label" for="input-name">Image</label>
                                                         <div class="field" align="left">
-                                                                <input type="file" id="files" data-rule-required="true"  data-msg-required="Please Select Atleast One.." accept=".jpg, .jpeg, .png,.pdf" name="image[]" multiple class="form-control image"  />
+                                                                <input type="file" id="fileuploads" name="avtar" require value="" data-rule-required="true"  data-msg-required="Please Select Atleast One.." accept=".jpg, .jpeg, .png,.pdf"  multiple class="form-control image"  />
                                                         </div>
 
                                                         @error('image')
@@ -119,14 +119,15 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-6">
+                                                <div class="col-md-6"> 
                                                     <div class="form-group mb-3">
                                                         <label class="control-label" for="input-name">Image Test</label>
                                                         <div class="field" align="left">
-                                                                <input type="file" id="myFileInput" accept=".jpg, .jpeg, .png,.pdf" name="image[]" multiple class="form-control image"  />
+                                                                <input type="file" id="myFileInput"    class="form-control image"  />
                                                             <img  src="" alt="" id="ImagePreview">
                                                             <p id="ImageRemove">remove</p>
                                                             </div>
+                                                                 
 
                                                         @error('image')
                                                             <div class="alert alert-danger">{{ $message }}</div>
@@ -156,7 +157,87 @@
                 </div>
             </div> <!-- container-fluid -->
         </div>
-       <!-- script for preview image -->
+        
+        <!-- <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" /> -->
+        <!-- <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script> -->
+       
+        <script>
+FilePond.registerPlugin(
+
+    // encodes the file as base64 data
+  FilePondPluginFileEncode,
+
+    // validates the size of the file
+    FilePondPluginFileValidateSize,
+
+    // corrects mobile image orientation
+    FilePondPluginImageExifOrientation,
+
+    // previews dropped images
+  FilePondPluginImagePreview
+);
+
+// Select the file input and use create() to turn it into a pond
+FilePond.create(
+    document.querySelector("input[name='filepond']")
+);
+</script>
+       <script>
+    // Get a reference to the file input element
+   
+    const inputElement = document.querySelector('input[id="fileuploads"]');
+    // Create a FilePond instance
+    const pond = FilePond.create( inputElement );
+    FilePond.setOptions({ 
+      server: {
+        //  allowReplace: false,
+         process: {
+            url : '{{route("admin.image.upload")}}',
+            revert: {
+            url: '{{route("admin.image.upload")}}',
+            headers: {
+               'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+        },
+            headers: {
+               'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            onload: (response) => {  console.log(response); $('.fileuploads').val(response); 
+                // onload: (response) => { arrayUploadImage.push(response); $('#overlay').fadeIn(); $('.image').val(response); console.log(arrayUploadImage); tempImagePreview(arrayUploadImage);  },
+            },
+        },
+      }
+   });
+
+//    $(document).ready(function() {    
+
+//     $("#btn-delete").click(function() {
+//         $.ajaxSetup({
+//             headers: {
+//                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//             }
+//         });
+//         $.ajax({
+//             type: 'DELETE',
+//             url: '/product/' + $("#frmDeleteProduct input[name=product_id]").val(),
+//             dataType: 'json',
+//             success: function(data) {
+//                 $("#frmDeleteProduct .close").click();
+//                 window.location.reload();
+//             },
+//             error: function(data) {
+//                 console.log(data);
+//             }
+//         });
+//     });
+// });
+
+</script>
+
+
+
+
+ <!-- script for preview image -->
         <script>
         $(document).ready(function() {
   if (window.File && window.FileList && window.FileReader) {
@@ -209,14 +290,12 @@
             });
             reader.readAsDataURL(this.files[0]);
         });
-
         document.addEventListener("DOMContentLoaded", () =>{
                 const recentImageDataUrl = localStorage.getItem("recent-image");
                 if(recentImageDataUrl){
                     document.querySelector("#ImagePreview").setAttribute("src",recentImageDataUrl);
                 }
         });
-
         document.addEventListener("DOMContentLoaded",() =>{
             const recentImageDataUrl = localStorage.removeItem("recent-image");
             if(recentImageDataUrl){
