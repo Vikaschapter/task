@@ -90,7 +90,7 @@
                                                     <div class="form-group mb-3">
                                                         <label class="control-label" for="input-name">Image</label>
                                                         <div class="field" align="left">
-                                                                <input type="file" id="fileuploads" name="avtar" require value="" data-rule-required="true"  data-msg-required="Please Select Atleast One.." accept=".jpg, .jpeg, .png,.pdf"  multiple class="form-control image"  />
+                                                                <input type="file" id="fileuploads" name="avtar[]" require value="" data-rule-required="true"  data-msg-required="Please Select Atleast One.." accept=".jpg, .jpeg, .png,.pdf"  multiple class="form-control image"  />
                                                         </div>
 
                                                         @error('image')
@@ -160,7 +160,7 @@
         
         <!-- <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" /> -->
         <!-- <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script> -->
-       
+ 
         <script>
 FilePond.registerPlugin(
 
@@ -178,36 +178,56 @@ FilePond.registerPlugin(
 );
 
 // Select the file input and use create() to turn it into a pond
-FilePond.create(
-    document.querySelector("input[name='filepond']")
-);
+
 </script>
        <script>
     // Get a reference to the file input element
    
-    const inputElement = document.querySelector('input[id="fileuploads"]');
-    // Create a FilePond instance
-    const pond = FilePond.create( inputElement );
-    FilePond.setOptions({ 
-      server: {
-        //  allowReplace: false,
-         process: {
-            url : '{{route("admin.image.upload")}}',
-            revert: {
-            url: '{{route("admin.image.upload")}}',
-            headers: {
-               'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    // const inputElement = document.querySelector('input[id="fileuploads"]');
+    // // Create a FilePond instance
+    // const pond = FilePond.create( inputElement );
+    // FilePond.setOptions({ 
+    //  server: {
+    //      allowReplace: false,
+    //      process: {
+    //         url : '{{route("admin.image.upload")}}',
+    //          headers: {
+    //            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    //         },
+    //         // onload: (response) => {  console.log(response); $('.fileuploads').val(response); 
+    //         //     // onload: (response) => { arrayUploadImage.push(response); $('#overlay').fadeIn(); $('.image').val(response); console.log(arrayUploadImage); tempImagePreview(arrayUploadImage);  },
+    //         // },
+    //     }, 
+    //     },
+    // });
+    const pondElement = document.querySelector('input[name="avtar[]"]');
+        const pond = FilePond.create( pondElement );
+
+        FilePond.setOptions({
+            server: {
+                url: "{!! route('admin.image.upload') !!}",
+                process: {
+                    headers: {
+                        'X-CSRF-TOKEN': '{!! csrf_token() !!}'
+                    }
+                },
+                 onload:(response) => {  console.log(response); $('.fileuploads').val(JSON.stringify(arrayUploadImage)); arrayUploadImage.push(response); console.log(arrayUploadImage); 
+                    tempImagePreview(arrayUploadImage);
+                    //         //     // onload: (response) => { arrayUploadImage.push(response); $('#overlay').fadeIn(); $('.image').val(response); console.log(arrayUploadImage); tempImagePreview(arrayUploadImage);  },
             },
-        },
-            headers: {
-               'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            onload: (response) => {  console.log(response); $('.fileuploads').val(response); 
-                // onload: (response) => { arrayUploadImage.push(response); $('#overlay').fadeIn(); $('.image').val(response); console.log(arrayUploadImage); tempImagePreview(arrayUploadImage);  },
-            },
-        },
-      }
-   });
+       
+            }
+            
+        });
+   const filepond_root = document.querySelector('.filepond--root');
+        filepond_root.addEventListener('FilePond:processfilerevert', e => {
+            $.ajax({
+                url: "{!! route('admin.image.delete.filepond') !!}",
+                type: 'POST',
+                data: {'_token': '{!! csrf_token() !!}', 'filename': e.detail.file.filename}
+            })
+            
+        });
 
 //    $(document).ready(function() {    
 

@@ -20,7 +20,7 @@ Route::get('/',[\App\Http\Controllers\Admin\HomeController::class, 'index'])->na
 Route::get('/create-image',[\App\Http\Controllers\Admin\HomeController::class, 'create'])->name('admin.image.create');
 Route::post('/store-image',[\App\Http\Controllers\Admin\HomeController::class, 'store'])->name('admin.image.store');
 Route::post('/store-upload',[\App\Http\Controllers\Admin\HomeController::class, 'filepond'])->name('admin.image.upload');
-Route::get('/delete-upload',[\App\Http\Controllers\Admin\HomeController::class, 'deletefilepond_image'])->name('admin.image.delete.filepond');
+Route::post('/delete-upload',[\App\Http\Controllers\Admin\HomeController::class, 'deletefilepond_image'])->name('admin.image.delete.filepond');
 
 ///////////////////////it is for delete image
 Route::delete('/delete-image/{id}',[\App\Http\Controllers\admin\HomeController::class,'delete'])->name('admin.image.delete');
