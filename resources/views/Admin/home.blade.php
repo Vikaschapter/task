@@ -42,28 +42,40 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                
                                                @foreach($data as $d)
                                                 <tr>
+                                                    <?php 
+
+                                                   $image =  $d['image'];
+                                                   $imageget = json_decode($image)[0]->{'avtar'} ?? '' ;
+                                                    //    print_r (json_decode(json_encode($d['image'])));
+                                                    
+                                                    ?>
+                                                   
                                                 <td>{{$d['id']}}</td>
                                                 <td>{{$d['title']}}</td>
                                                 <td>
                                                     @php
-                                                     $extension = pathinfo(storage_path($d['image']), PATHINFO_EXTENSION);
+                                                     $extension = pathinfo(storage_path($imageget), PATHINFO_EXTENSION);
                                                     // print_r($extension);
                                                      @endphp
                                                      @if ($extension == 'png')
-                                                       <a href="{{URL::asset('/images/'.$d['image'])}}"> <img src="{{URL::asset('/images/'.$d['image'])}}" alt="{{$d['image']}}" height="40px" width="70px" class="img-fluid d-block" data-min="2" data-toggle="tooltip" data-placement="top" title="View Image"/>
+                                                       <a href="{{URL::asset('/images/'.$imageget)}}"> <img src="{{URL::asset('/images/'.$imageget)}}" alt="{{$imageget}}" height="40px" width="70px" class="img-fluid d-block" data-min="2" data-toggle="tooltip" data-placement="top" title="View Image"/>
                                                        </a> 
                                                        @elseif($extension == 'jpg')
-                                                       <a href="{{URL::asset('/images/'.$d['image'])}}"><img src="{{URL::asset('/images/'.$d['image'])}}" alt="{{$d['image']}}" height="40px" width="70px" class="img-fluid d-block" data-toggle="tooltip" data-placement="top" title="View Image" />
+                                                       <a href="{{URL::asset('/images/'.$imageget)}}"><img src="{{URL::asset('/images/'.$imageget)}}" alt="{{$imageget}}" height="40px" width="70px" class="img-fluid d-block" data-toggle="tooltip" data-placement="top" title="View Image" />
+                                                       </a>
+                                                       @elseif($extension == 'jpeg')
+                                                       <a href="{{URL::asset('/images/'.$imageget)}}"><img src="{{URL::asset('/images/'.$imageget)}}" alt="{{$imageget}}" height="40px" width="70px" class="img-fluid d-block" data-toggle="tooltip" data-placement="top" title="View Image" />
                                                        </a>
                                                        @else
-                                                       <a href="{{URL::asset('/images/'.$d['image'])}}" data-toggle="tooltip" data-placement="top" title="View Pdf">  <i class="bx bxs-file-pdf" style="font-size:30px"></i></a>
+                                                       <a href="{{URL::asset('/images/'.$imageget)}}" data-toggle="tooltip" data-placement="top" title="View Pdf">  <i class="bx bxs-file-pdf" style="font-size:30px"></i></a>
                                                        @endif                                                       
                                                </td>
                                                 
                                                <td>
-                                                    
+                                               <button class="btn btn-success" href="" type="submit"><a href ="{{route('admin.image.edit',$d->id)}}" >Edit</a></button>
                                                     <form action="{{route('admin.image.delete',$d->id)}}" method="POST">
                                                         @csrf
                                                         @method('delete')

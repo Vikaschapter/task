@@ -23,6 +23,10 @@ Route::post('/store-upload',[\App\Http\Controllers\Admin\HomeController::class, 
 Route::post('/delete-upload',[\App\Http\Controllers\Admin\HomeController::class, 'deletefilepond_image'])->name('admin.image.delete.filepond');
 
 ///////////////////////it is for delete image
-Route::delete('/delete-image/{id}',[\App\Http\Controllers\admin\HomeController::class,'delete'])->name('admin.image.delete');
+Route::delete('/delete-image/{id}',[\App\Http\Controllers\Admin\HomeController::class,'delete'])->name('admin.image.delete');
+
+Route::get('/image-edit/{id}',[\App\Http\Controllers\Admin\HomeController::class,'edit'])->name('admin.image.edit');
+Route::post('/image-edit/{id}',[\App\Http\Controllers\Admin\HomeController::class,'update'])->name('admin.image.update');
+Route::get('/image-remove',[\App\Http\Controllers\Admin\HomeController::class,'removeimage'])->name('admin.image.remove');
 
 

@@ -1,110 +1,192 @@
 <x-admin-layout>
     @section('content')
-   <style>
-        input[type="file"] {
-  display: block;
-}
-.imageThumb {
-  max-height: 75px;
-  border: 2px solid;
-  padding: 1px;
-  cursor: pointer;
-}
-.pip {
-  display: inline-block;
-  margin: 10px 10px 0 0;
-}
-.remove {
-  display: block;
-  background: #444;
-  border: 1px solid black;
-  color: white;
-  text-align: center;
-  cursor: pointer;
-}
-.remove:hover {
-  background: white;
-  color: black;
-}
-   </style>
-        <div class="page-content">
-            <div class="container-fluid">
-                <!-- start page title -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0">Create Records</h4>
+    <style>
+  
 
-                            <div class="page-title-right">
-                                <ol class="breadcrumb m-0">
-                                    <li class="breadcrumb-item"><a href="javascript: void(0);">Create Employee</a></li>
-                                    <li class="breadcrumb-item active">Create</li>
-                                </ol>
-                            </div>
-                            
+    .image-area {
+        position: relative;
+        width: 17%;
+        background: #333;
+    }
+
+    .image-area img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .remove-image {
+        display: none;
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        border-radius: 10em;
+        padding: 2px 6px 3px;
+        text-decoration: none;
+        font: 700 21px/20px sans-serif;
+        background: #555;
+        border: 3px solid #fff;
+        color: #FFF;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        -webkit-transition: background 0.5s;
+        transition: background 0.5s;
+    }
+
+    .remove-image:hover {
+        background: #E54E4E;
+        padding: 3px 7px 5px;
+        top: -11px;
+        right: -11px;
+    }
+
+    .remove-image:active {
+        background: #E54E4E;
+        top: -10px;
+        right: -11px;
+    }
+    </style>
+    <div class="page-content">
+        <div class="container-fluid">
+            <!-- start page title -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                        <h4 class="mb-sm-0">Create Records</h4>
+
+                        <div class="page-title-right">
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item"><a href="javascript: void(0);">Create Employee</a></li>
+                                <li class="breadcrumb-item active">Create</li>
+                            </ol>
                         </div>
+
                     </div>
                 </div>
-                <!-- end page title -->
-                <div class="row mt-2">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h4 class="card-title mb-0">Create Employee</h4>
-                                    </div><!-- end card header -->
-                                    <div class="card-body">
-                                    @if(session()->has('error'))
-                                        <div class="alert alert-danger">
-                                            {{ session()->get('error') }}
-                                        </div>
+            </div>
+            <!-- end page title -->
+            <div class="row mt-2">
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title mb-0">Create Employee</h4>
+                                </div><!-- end card header -->
+                                <div class="card-body">
+                                    @if (session()->has('error'))
+                                    <div class="alert alert-danger">
+                                        {{ session()->get('error') }}
+                                    </div>
                                     @endif
-                                     <form enctype="multipart/form-data" id="addForm" action="{{ route('admin.image.store') }}"
-                                            method="POST" id="main_form">
+                                    @if (session()->has('message'))
+                                    <div class="alert alert-success">
+                                        {{ session()->get('message') }}
+                                    </div>
+                                    @endif
+                                    @if (isset($image->id))
+                                    <form action="{{ route('admin.image.update', ['id' => $image->id]) }}"
+                                        id="validate-me-plz" method="post" enctype="multipart/form-data">
+                                        @else
+                                        <form enctype="multipart/form-data" action="{{ route('admin.image.store') }}"
+                                            method="POST" id="validate-me-plz">
+                                            @endif
                                             @csrf
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group mb-3">
-                                                        <label class="control-label" for="title">Title</label> 
-                                                        <input type="text" name="title" id="name" placeholder="Image Title"
-                                                            class="form-control" data-rule-required="true" data-rule-minlength="2" data-msg-required="Please enter Title.">
+                                                        <label class="control-label" for="title">Title</label>
+                                                        @if (isset($image->id))
+                                                        <input type="text" name="title" id="name"
+                                                            placeholder="Image Title" class="form-control"
+                                                            data-rule-required="true" data-rule-minlength="2"
+                                                            data-msg-required="Please enter Title."
+                                                            value="{{ $image->title }}">
+                                                            @error('title')
+                                                        <div class="alert alert-danger">{{ $message }}</div>
+                                                        @enderror
+                                                        @else
+                                                        <input type="text" name="title" id="name"
+                                                            placeholder="Image Title" class="form-control"
+                                                            data-rule-required="true" data-rule-minlength="2"
+                                                            data-msg-required="Please enter Title.">
+                                                        @endif
                                                         @error('title')
-                                                            <div class="alert alert-danger">{{ $message }}</div>
+                                                        <div class="alert alert-danger">{{ $message }}</div>
                                                         @enderror
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group mb-3">
                                                         <label class="control-label" for="email">Email</label>
-                                                        <input type="text" name="email" id="Email" placeholder="Enter Your Email"
-                                                            class="form-control"  data-rule-required="true" data-rule-email="true" >
+                                                        @if (isset($image->id))
+                                                        <input type="text" name="email" id="Email"
+                                                            placeholder="Enter Your Email" class="form-control" require
+                                                            data-rule-required="true" data-rule-email="true" value="">
+                                                       
+                                                            @error('title')
+                                                        <div class="alert alert-danger">{{ $message }}</div>
+                                                        @enderror
+                                                            @else
+                                                        <input type="text" name="email" id="Email"
+                                                            placeholder="Enter Your Email" class="form-control" require
+                                                            data-rule-required="true" data-rule-email="true">
+                                                        @endif
+
                                                         @error('title')
-                                                            <div class="alert alert-danger">{{ $message }}</div>
+                                                        <div class="alert alert-danger">{{ $message }}</div>
                                                         @enderror
                                                     </div>
                                                 </div>
-                                              
+
 
                                                 <div class="col-md-6">
                                                     <div class="form-group mb-3">
                                                         <label class="control-label" for="input-name">Image</label>
                                                         <div class="field" align="left">
-                                                                <input type="file" id="fileuploads" name="avtar[]" require value="" data-rule-required="true"  data-msg-required="Please Select Atleast One.." accept=".jpg, .jpeg, .png,.pdf"  multiple class="form-control image"  />
+                                                            @if (isset($image->id))
+                                                            <input type="file" id="fileuploads" name="avtar[]" require
+                                                                value="" data-rule-required="true"
+                                                                data-msg-required="Please Select Atleast One.."
+                                                                accept=".jpg, .jpeg, .png,.pdf" multiple
+                                                                class="form-control image"
+                                                                value="{{ $image->image }}" />
+                                                            <br>
+
+                                                            <?php
+                                                            $image = $image['image'];
+                                                            
+                                                            $imageconvert = json_encode(json_decode($image)[0]->avtar);
+                                                            $imageget = str_replace('"', '', $imageconvert);
+                                                            ?>
+
+                                                            <div class="image-area">
+                                                                <img src="{{ URL::asset('/images/' . $imageget) }}"
+                                                                    alt="{{ $imageget }}" height="80px" width="80px" />
+                                                                <a class="remove-image "   id="bksv" 
+                                                                    style="display: inline;">&#215;</a>
+                                                            </div>
+                                                            @error('image')
+                                                        <div class="alert alert-danger">{{ $message }}</div>
+                                                        @enderror
+                                                            @else
+                                                            <input type="file" id="fileuploads" name="avtar[]" require
+                                                                value="" data-rule-required="true"
+                                                                data-msg-required="Please Select Atleast One.."
+                                                                accept=".jpg, .jpeg, .png,.pdf" multiple
+                                                                class="form-control image" />
+                                                            @endif
                                                         </div>
 
                                                         @error('image')
-                                                            <div class="alert alert-danger">{{ $message }}</div>
+                                                        <div class="alert alert-danger">{{ $message }}</div>
                                                         @enderror
-                                                        <span class="invalid" id="image-status"></span>
-                                                        <!-- <img id="previewImages" height /> -->
-                                                        <div class="previewImages"></div>
                                                     </div>
                                                 </div>
-                                               
-    
+
+
                                                 <div class="col-md-6">
-                                                    <label class="control-label" for="input-status">Status of Image</label>
+                                                    <label class="control-label" for="input-status">Status of
+                                                        Image</label>
                                                     <div class="form-group mb-3">
                                                         <input type="radio" name="status" value="1" placeholder="Status"
                                                             id="input-status" checked="checked">
@@ -113,31 +195,11 @@
                                                             id="imgInp">
                                                         <label class="control-label" for="input-status">Inactive</label>
                                                         @error('stathhbus')
-                                                            <div class="alert alert-danger">{{ $message }}</div>
+                                                        <div class="alert alert-danger">{{ $message }}</div>
                                                         @enderror
                                                         <span class="invalid" id="status-status"></span>
                                                     </div>
                                                 </div>
-
-                                                <div class="col-md-6"> 
-                                                    <div class="form-group mb-3">
-                                                        <label class="control-label" for="input-name">Image Test</label>
-                                                        <div class="field" align="left">
-                                                                <input type="file" id="myFileInput"    class="form-control image"  />
-                                                            <img  src="" alt="" id="ImagePreview">
-                                                            <p id="ImageRemove">remove</p>
-                                                            </div>
-                                                                 
-
-                                                        @error('image')
-                                                            <div class="alert alert-danger">{{ $message }}</div>
-                                                        @enderror
-                                                      
-                                                        <div class="previewImages"></div>
-                                                    </div>
-                                                </div>
-
-
                                                 <div class="col-lg-12">
                                                     <div class="text-end">
                                                         <button type="submit" class="btn btn-primary">Submit</button>
@@ -147,183 +209,126 @@
                                             </div>
                                             <!--end row-->
                                         </form>
-                                    </div>
-                                    <!-- end card body -->
                                 </div>
+                                <!-- end card body -->
                             </div>
-                        </div> <!-- end col -->
-                    </div>
-                    <!-- end col -->
+                        </div>
+                    </div> <!-- end col -->
                 </div>
-            </div> <!-- container-fluid -->
-        </div>
-        
-        <!-- <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" /> -->
-        <!-- <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script> -->
- 
-        <script>
-FilePond.registerPlugin(
-
-    // encodes the file as base64 data
-  FilePondPluginFileEncode,
-
-    // validates the size of the file
-    FilePondPluginFileValidateSize,
-
-    // corrects mobile image orientation
-    FilePondPluginImageExifOrientation,
-
-    // previews dropped images
-  FilePondPluginImagePreview
-);
-
-// Select the file input and use create() to turn it into a pond
-
-</script>
-       <script>
-    // Get a reference to the file input element
-   
-    // const inputElement = document.querySelector('input[id="fileuploads"]');
-    // // Create a FilePond instance
-    // const pond = FilePond.create( inputElement );
-    // FilePond.setOptions({ 
-    //  server: {
-    //      allowReplace: false,
-    //      process: {
-    //         url : '{{route("admin.image.upload")}}',
-    //          headers: {
-    //            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-    //         },
-    //         // onload: (response) => {  console.log(response); $('.fileuploads').val(response); 
-    //         //     // onload: (response) => { arrayUploadImage.push(response); $('#overlay').fadeIn(); $('.image').val(response); console.log(arrayUploadImage); tempImagePreview(arrayUploadImage);  },
-    //         // },
-    //     }, 
-    //     },
-    // });
-    const pondElement = document.querySelector('input[name="avtar[]"]');
-        const pond = FilePond.create( pondElement );
-
-        FilePond.setOptions({
-            server: {
-                url: "{!! route('admin.image.upload') !!}",
-                process: {
-                    headers: {
-                        'X-CSRF-TOKEN': '{!! csrf_token() !!}'
-                    }
-                },
-                 onload:(response) => {  console.log(response); $('.fileuploads').val(JSON.stringify(arrayUploadImage)); arrayUploadImage.push(response); console.log(arrayUploadImage); 
-                    tempImagePreview(arrayUploadImage);
-                    //         //     // onload: (response) => { arrayUploadImage.push(response); $('#overlay').fadeIn(); $('.image').val(response); console.log(arrayUploadImage); tempImagePreview(arrayUploadImage);  },
-            },
-       
-            }
-            
-        });
-   const filepond_root = document.querySelector('.filepond--root');
-        filepond_root.addEventListener('FilePond:processfilerevert', e => {
+                <!-- end col -->
+            </div>
+        </div> <!-- container-fluid -->
+    </div>
+    <script >
+    $(document).ready(function() {
+        $("#bksv").click(function(e) {
             $.ajax({
-                url: "{!! route('admin.image.delete.filepond') !!}",
-                type: 'POST',
-                data: {'_token': '{!! csrf_token() !!}', 'filename': e.detail.file.filename}
-            })
-            
+            url: "{{ route('admin.image.remove') }}",
+            type: 'GET',
+            data: {
+                'id': 12
+            }
+        })
         });
-
-//    $(document).ready(function() {    
-
-//     $("#btn-delete").click(function() {
-//         $.ajaxSetup({
-//             headers: {
-//                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-//             }
-//         });
-//         $.ajax({
-//             type: 'DELETE',
-//             url: '/product/' + $("#frmDeleteProduct input[name=product_id]").val(),
-//             dataType: 'json',
-//             success: function(data) {
-//                 $("#frmDeleteProduct .close").click();
-//                 window.location.reload();
-//             },
-//             error: function(data) {
-//                 console.log(data);
-//             }
-//         });
-//     });
-// });
-
-</script>
-
-
-
-
- <!-- script for preview image -->
-        <script>
-        $(document).ready(function() {
-  if (window.File && window.FileList && window.FileReader) {
-    $("#files").on("change", function(e) {
-      var files = e.target.files,
-        filesLength = files.length;
-      for (var i = 0; i < filesLength; i++) {
-        var f = files[i]
-        var fileReader = new FileReader();
-        fileReader.onload = (function(e) {
-          var file = e.target;
-          $("<span class=\"pip\">" +
-            "<img class=\"imageThumb\" src=\"" + e.target.result + "\" title=\"" + file.name + "\"/>" +
-            "<br/><span class=\"remove\">Remove image</span>" +
-            "</span>").insertAfter("#files");
-          $(".remove").click(function(){
-            $(this).parent(".pip").remove();
-          });
-        });
-        fileReader.readAsDataURL(f);
-      }
     });
-  } else {
-    alert("Your browser doesn't support to File API")
-  }
-});
-</script>
-<!-- for validation -->
-<script>
-	$('#validate-me-plz').validate({
-		ignore: [],
+    </script>
+
+
+
+
+    <script>
+    FilePond.registerPlugin(
+
+        // encodes the file as base64 data
+        FilePondPluginFileEncode,
+
+        // validates the size of the file
+        FilePondPluginFileValidateSize,
+
+        // corrects mobile image orientation
+        FilePondPluginImageExifOrientation,
+
+        // previews dropped images
+        FilePondPluginImagePreview,
+    );
+
+    // Select the file input and use create() to turn it into a pond
+    const pondElement = document.querySelector('input[name="avtar[]"]');
+    const pond = FilePond.create(pondElement);
+
+    FilePond.setOptions({
+        server: {
+            url: "{!! route('admin.image.upload') !!}",
+            process: {
+                headers: {
+                    'X-CSRF-TOKEN': '{!! csrf_token() !!}'
+                }
+            },
+            onload: (response) => {
+                console.log(response);
+                $('.fileuploads').val(JSON.stringify(arrayUploadImage));
+                arrayUploadImage.push(response);
+                console.log(arrayUploadImage);
+                tempImagePreview(arrayUploadImage);
+                //         //     // onload: (response) => { arrayUploadImage.push(response); $('#overlay').fadeIn(); $('.image').val(response); console.log(arrayUploadImage); tempImagePreview(arrayUploadImage);  },
+            },
+
+        }
+
+    });
+    const filepond_root = document.querySelector('.filepond--root');
+    filepond_root.addEventListener('FilePond:processfilerevert', e => {
+        $.ajax({
+            url: "{!! route('admin.image.delete.filepond') !!}",
+            type: 'POST',
+            data: {
+                '_token': '{!! csrf_token() !!}',
+                'filename': e.detail.file.filename
+            }
+        })
+
+    });
+    </script>
+
+
+
+    <script>
+    $('#validate-me-plz').validate({
+        ignore: [],
         onfocusout: function(element) {
-        this.element(element);
+            this.element(element);
         },
         errorClass: 'error_validate',
-        errorElement:'lable',
+        errorElement: 'lable',
         // highlight: function(element, errorClass) {
         // $(element).removeClass(errorClass);
         // }
-	});
-</script>
+    });
+    </script>
 
     <!-- store image in session -->
     <script>
-        document.querySelector("#myFileInput").addEventListener("change",function(){
-            // console.log(this.files)
-            const reader = new FileReader();
-            reader.addEventListener("load",() =>{
-                 localStorage.setItem("recent-image",reader.result);   
-            });
-            reader.readAsDataURL(this.files[0]);
+    document.querySelector("#myFileInput").addEventListener("change", function() {
+        // console.log(this.files)
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+            localStorage.setItem("recent-image", reader.result);
         });
-        document.addEventListener("DOMContentLoaded", () =>{
-                const recentImageDataUrl = localStorage.getItem("recent-image");
-                if(recentImageDataUrl){
-                    document.querySelector("#ImagePreview").setAttribute("src",recentImageDataUrl);
-                }
-        });
-        document.addEventListener("DOMContentLoaded",() =>{
-            const recentImageDataUrl = localStorage.removeItem("recent-image");
-            if(recentImageDataUrl){
-                document.querySelector("#ImageRemove").setAttribute("src",recentImageDataUrl);
-                
-            }
-        })
-    </script>
+        reader.readAsDataURL(this.files[0]);
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+        const recentImageDataUrl = localStorage.getItem("recent-image");
+        if (recentImageDataUrl) {
+            document.querySelector("#ImagePreview").setAttribute("src", recentImageDataUrl);
+        }
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+        const recentImageDataUrl = localStorage.removeItem("recent-image");
+        if (recentImageDataUrl) {
+            document.querySelector("#ImageRemove").setAttribute("src", recentImageDataUrl);
 
+        }
+    })
+    </script>
     @endsection
     </x-admin_layout>
