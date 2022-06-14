@@ -13,6 +13,7 @@ class Image extends Model
         'title',
         'image',
         'status',
+        'user_id'
     ];
     protected $dates = [
         'created_at',

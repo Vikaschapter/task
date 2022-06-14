@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Image,TemporaryFile};
+use App\Models\{Image, TemporaryFile};
 use App\Repositories\ImageRepository;
+use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -26,176 +27,185 @@ class HomeController extends Controller
 
     public function index()
     {
-       $data = Image::all();
+        $data = Image::orderBy('user_id')->get()->groupBy('user_id');
+        //  foreach($data as $d){
+        //     foreach($d as $d1){
+        //         // dd($d1['image']);
+        //     } 
+        //  }
         return view('Admin.home', compact('data'));
     }
 
     public function create()
     {
-    // dd("here");
         $data = TemporaryFile::get()->last();
-        return view('Admin.imageform' ,compact('data'));
+        return view('Admin.imageform', compact('data'));
     }
 
     public function store(Request $request)
     {
-    //    dd($request);
-        // return $request->all();
-        // return $_FILES;
-           $image =  $request['avtar'];
 
-        //    return  (json_decode($image[0])[0]);
-       
+        $image =  $request['avtar'];
+        $imagedata = Image::get()->unique('user_id')->count();
         $validation = Validator::make($request->all(), [
             'title' => 'required|string',
-            'avtar'=>'required',
+            'avtar' => 'required',
             'status' => 'required|boolean',
         ]);
 
         if ($validation->fails()) {
             return back()->withErrors($validation->errors());
         }
-       
+
         for ($i = 0; $i < count($request->avtar); $i++) {
             $answers[] = [
                 'title' => $request->title,
                 'image' => $request->avtar[$i],
-                'status' => $request->status
+                'status' => $request->status,
+                'user_id' => $imagedata + 1
             ];
             $ImageDetails = Image::insert($answers);
         }
-       
-            foreach($image as $avt){
-                $imagename = json_decode($image[0])[0]->{'avtar'} ;
-                $foldername = json_decode($image[0])[1]->{'folder'};
-               $temporaryFile  =  TemporaryFile::where('filename',$imagename)->Where('folder',$foldername); 
-          
-               if($temporaryFile){
+
+        foreach ($image as $avt) {
+            $imagename = json_decode($image[0])[0]->{'avtar'};
+            $foldername = json_decode($image[0])[1]->{'folder'};
+            $temporaryFile  =  TemporaryFile::where('filename', $imagename)->Where('folder', $foldername);
+
+            if ($temporaryFile) {
                 $temporaryFolder = Session::get('folder');
-                 $old_path = storage_path("app/public/avtars/tmp$temporaryFolder/$imagename");
+                $old_path = storage_path("app/public/avtars/tmp$temporaryFolder/$imagename");
                 //    = public_path("app/public/storage/avtars/tmp$temporaryFolder/$imagename");
-                  $new_path = public_path("/images/$imagename");
-                  if (file_exists($old_path)){
-                      $move = file::move($old_path,$new_path);
-                     
+                $new_path = public_path("/images/$imagename");
+                if (file_exists($old_path)) {
+                    $move = file::move($old_path, $new_path);
+
                     File::deleteDirectory(public_path("storage/avtars/tmp$temporaryFolder"));
                 }
-                 $temporaryFile->delete();
-              }  
-             }
-                   
-
-
-        // if ($files = $request->file('image')) {
-        //     foreach ($files as $file) {
-        //         $fileName = $file->getClientOriginalName();
-        //         $allowedfileExtension = ['png', 'pdf', 'dox', 'jpg', 'jpeg'];
-        //         $extension = $file->getClientOriginalExtension();
-        //         $check = in_array($extension, $allowedfileExtension);
-        //         if ($check) {
-        //             $destinationPath = public_path() . '/images';
-        //             $file->move($destinationPath, $fileName);
-
-        //              $ImageDetails =  ([
-        //                 'title' => $request['title'],
-        //                 'status' => $request['status'],
-        //             ]);
-
-        //                return $temporaryFile  =  TemporaryFile::where('folder',$request->avtar)->first();
-
-        //             $ImageDetails = addmedia(storage_path('app/avtars/tmp/'.$request->avtar .'/'.$filename))->toMediaCollection('avatars');
-        //              $data = $this->imageRepository->createImage($ImageDetails);
-        //         } else {
-        //             return back()->with('error', ' Sorry Only Allow png,pdf,dox,jpg,jpeg!');
-        //             // echo '<div class="alert alert-warning"><strong>Warning!</strong> Sorry Only Upload png , jpg , doc</div>';
-        //         }
-        //     }
-        // }
-           
+                $temporaryFile->delete();
+            }
+        }
         return redirect('/')->with('message', "Image Added Successfully");
     }
 
     public function deletefilepond_image(request $request)
-    {   
-        
-      $temporaryFolder = Session::get('folder');
-    //   $nameFile = Session::get('filename');
-     $path = storage_path("app/public/avtars/tmp$temporaryFolder/{$request->filename}");
-       if(file::exists($path)){
-              
-        unlink($path);
-           TemporaryFile::where(['folder'=>$temporaryFolder,
-                                  'filename'=> $request->filename    
+    {
+
+        $temporaryFolder = Session::get('folder');
+        //   $nameFile = Session::get('filename');
+        $path = storage_path("app/public/avtars/tmp$temporaryFolder/{$request->filename}");
+        if (file::exists($path)) {
+
+            unlink($path);
+            TemporaryFile::where([
+                'folder' => $temporaryFolder,
+                'filename' => $request->filename
             ])->delete();
             return "success";
-       }else{
-           return "notfound";
-       }
+        } else {
+            return "notfound";
+        }
     }
 
-    public function filepond(request $request ){
+    public function filepond(request $request)
+    {
         //  dd("filepond store");
-        if($request->hasfile('avtar')){
+        if ($request->hasfile('avtar')) {
             $files = $request->file('avtar');
-            foreach($files as $file){
+            foreach ($files as $file) {
                 $filename = $file->getClientOriginalName();
-                $folder = uniqid() . '_' . now()->timestamp; 
-                Session::put('folder',$folder);
-                Session::put('filename',$filename);
-                $file->storeAs('public/avtars/tmp' . $folder,$filename);
-               
-                TemporaryFile::create([
-                'folder' =>$folder,
-                'filename' => $filename
-               ]);
-            }
-           
-           
-        }
-        return response()->json([['avtar' => $filename],['folder'=>$folder]]);
+                $folder = uniqid() . '_' . now()->timestamp;
+                Session::put('folder', $folder);
+                Session::put('filename', $filename);
+                $file->storeAs('public/avtars/tmp' . $folder, $filename);
 
+                TemporaryFile::create([
+                    'folder' => $folder,
+                    'filename' => $filename
+                ]);
+            }
+        }
+        return response()->json([['avtar' => $filename], ['folder' => $folder]]);
     }
 
     public function delete($id)
     {
-      $image = Image::find($id);
-        $imagevar =  $image['image'];
-        $imagecovert =  json_decode($imagevar)[0]->{'avtar'};
-        File::deleteDirectory(public_path('/images/' . $imagecovert));
+
+        $image = Image::where('user_id', $id);
+        $imagedelete = $image->get();
+        for ($i = 0; $i < count($imagedelete); $i++) {
+            $dat =  json_decode($imagedelete[$i]->image)[0]->avtar;
+            File::deleteDirectory(public_path('/images/' . $dat));
+        }
         $image->delete();
         return back()->with('message', 'SuccessFully Deleted');
     }
 
-    public function edit($id){
-        $image = Image::find($id);
-        return view('Admin.imageform',compact('image'));
+    public function edit($id)
+    {
+        $image = Image::where('user_id', $id)->get();
+        //   $image = Image::find($id);
+        return view('Admin.imageeditform', compact('image'));
     }
 
-    public function removeimage(Request $Request){
-        return "hello";
+    public function removeimage(Request $Request)
+    {
+        $image = Image::find($Request->id);
+        $image->delete();
+        return response()->json("message", 'success');
     }
 
-    public function update(request $request,$id){
-        // return $image = Image::find($id);
+    public function update(request $request, $id)
+    {
+        //   return $request->all();
         $validation = Validator::make($request->all(), [
             'title' => 'required|string',
-            'avtar'=>'required',
             'status' => 'required|boolean',
         ]);
 
         if ($validation->fails()) {
             return back()->withErrors($validation->errors());
         }
-        $image = Image::find($id);
-        for ($i = 0; $i < count($request->avtar); $i++) {
-            $answers[] = [
-                'title' => $request->title,
-                'image' => $request->avtar[$i],
-                'status' => $request->status
-            ];
+        $imageupdate = Image::where('user_id', $request->id)->first();
+        if ($request->avtar) {
+            for ($i = 0; $i < count($request->avtar); $i++) {
+                $answers[] = [
+                    'title' => $request->title,
+                    'image' => $request->avtar[$i],
+                    'status' => $request->status,
+                    'user_id' => $request->id
+                ];
+                $ImageDetails = Image::insert($answers);
+            }
+            $image =  $request['avtar'];
+            foreach ($image as $avt) {
+                $imagename = json_decode($image[0])[0]->{'avtar'};
+                $foldername = json_decode($image[0])[1]->{'folder'};
+                $temporaryFile  =  TemporaryFile::where('filename', $imagename)->Where('folder', $foldername);
+
+                if ($temporaryFile) {
+                    $temporaryFolder = Session::get('folder');
+                    $old_path = storage_path("app/public/avtars/tmp$temporaryFolder/$imagename");
+                    //    = public_path("app/public/storage/avtars/tmp$temporaryFolder/$imagename");
+                    $new_path = public_path("/images/$imagename");
+                    if (file_exists($old_path)) {
+                        $move = file::move($old_path, $new_path);
+
+                        File::deleteDirectory(public_path("storage/avtars/tmp$temporaryFolder"));
+                    }
+                    $temporaryFile->delete();
+                }
+            }
         }
-        $image->update($answers);
+
+        $dataimage = Image::where('user_id', $request->id)->first();
+        $dataimages = [
+            'status' => $request->status,
+            'title' => $request->title
+        ];
+        $dataimage->update($dataimages);
+
+
         return back()->with('message', "Update Success Full");
-        
     }
 }
