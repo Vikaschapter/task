@@ -29,3 +29,5 @@ Route::get('/image-edit/{id}',[\App\Http\Controllers\Admin\HomeController::class
 Route::post('/image-edit/{id}',[\App\Http\Controllers\Admin\HomeController::class,'update'])->name('admin.image.update');
 Route::get('/image-remove',[\App\Http\Controllers\Admin\HomeController::class,'removeimage'])->name('admin.image.remove');
 
+/////////////////it is for status of image 
+Route::post('/image/status/{id}', [\App\Http\Controllers\Admin\HomeController::class,'status'])->name('admin.image.status');

@@ -5,6 +5,7 @@
             position: relative;
             width: 17%;
             background: #333;
+            margin-right: 10px;
         }
 
         .image-area img {
@@ -49,12 +50,12 @@
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                        <h4 class="mb-sm-0">Create Records</h4>
+                        <h4 class="mb-sm-0">Create Images</h4>
 
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="javascript: void(0);">Create Employee</a></li>
-                                <li class="breadcrumb-item active">Create</li>
+                                <li class="breadcrumb-item"><a href="/">Images </a></li>
+                                <li class="breadcrumb-item active">Create Images</li>
                             </ol>
                         </div>
 
@@ -69,9 +70,13 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
-                                <div class="card-header">
-                                    <h4 class="card-title mb-0">Create Employee</h4>
-                                </div><!-- end card header -->
+                            <div class="card-header d-flex align-items-center">
+                                    <h5 class="card-title mb-0 flex-grow-1">Create Images</h5>
+                                    <div>
+                                        <a href="/"> <button  class="btn btn-success">Image List</button></a>
+                                    </div>
+                                </div>
+                                <!-- end card header -->
                                 <div class="card-body">
                                     @if (session()->has('error'))
                                     <div class="alert alert-danger">
@@ -107,24 +112,7 @@
                                                         @enderror
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group mb-3">
-                                                        <label class="control-label" for="email">Email</label>
-                                                        @if (isset($image->id))
-                                                        <input type="text" name="email" id="Email" placeholder="Enter Your Email" class="form-control" require data-rule-required="true" data-rule-email="true" value="">
-
-                                                        @error('title')
-                                                        <div class="alert alert-danger">{{ $message }}</div>
-                                                        @enderror
-                                                        @else
-                                                        <input type="text" name="email" id="Email" placeholder="Enter Your Email" class="form-control" require data-rule-required="true" data-rule-email="true">
-                                                        @endif
-
-                                                        @error('title')
-                                                        <div class="alert alert-danger">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
+                                                
 
                                                 <div class="col-md-6">
                                                     <div class="form-group mb-3">

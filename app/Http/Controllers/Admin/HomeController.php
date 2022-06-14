@@ -58,15 +58,14 @@ class HomeController extends Controller
         }
 
         for ($i = 0; $i < count($request->avtar); $i++) {
-            $answers[] = [
+            $answers = [
                 'title' => $request->title,
                 'image' => $request->avtar[$i],
                 'status' => $request->status,
                 'user_id' => $imagedata + 1
             ];
-            $ImageDetails = Image::insert($answers);
+             Image::insert($answers);
         }
-
         foreach ($image as $avt) {
             $imagename = json_decode($image[0])[0]->{'avtar'};
             $foldername = json_decode($image[0])[1]->{'folder'};
@@ -152,7 +151,15 @@ class HomeController extends Controller
     {
         $image = Image::find($Request->id);
         $image->delete();
-        return response()->json("message", 'success');
+        return response()->json(["Image Deleted Succesfull"]);
+    }
+
+    public function status($id)
+    { 
+      $status =  Image::where('user_id',$id)->first()->status;
+        $status = $status ? '0' : '1';
+        Image::where('user_id',$id)->update([ 'status' => $status ]);
+        return back()->with('message', " Status Updated Successfully");
     }
 
     public function update(request $request, $id)
@@ -169,13 +176,13 @@ class HomeController extends Controller
         $imageupdate = Image::where('user_id', $request->id)->first();
         if ($request->avtar) {
             for ($i = 0; $i < count($request->avtar); $i++) {
-                $answers[] = [
+                $answers = [
                     'title' => $request->title,
                     'image' => $request->avtar[$i],
                     'status' => $request->status,
                     'user_id' => $request->id
                 ];
-                $ImageDetails = Image::insert($answers);
+                Image::insert($answers);
             }
             $image =  $request['avtar'];
             foreach ($image as $avt) {
@@ -206,6 +213,6 @@ class HomeController extends Controller
         $dataimage->update($dataimages);
 
 
-        return back()->with('message', "Update Success Full");
+        return redirect('/')->with('message', "Update Success Full");
     }
 }

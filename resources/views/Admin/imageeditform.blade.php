@@ -4,6 +4,7 @@
         .image-area {
             position: relative;
             width: 17%;
+            margin-right: 10px;
             background: #333;
         }
 
@@ -69,32 +70,37 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
-                                @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                   
-                                    @if (session()->has('message'))
-                                    <div class="alert alert-success">
-                                        {{ session()->get('message') }}
-                                    </div>
-                                    @endif
+
+                                @if (session()->has('error'))
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong> {{ session()->get('error') }} </strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                                 @endif
-                                <div class="card-header">
-                                    <h4 class="card-title mb-0">Create Employee</h4>
-                                </div><!-- end card header -->
+                                @if (session()->has('message'))
+                                <!-- Success Alert -->
+                                <div class="alert alert-success alert-border-left alert-dismissible fade show" id="message" role="alert">
+                                    <i class="ri-check-double-line me-3 align-middle"></i> <strong>{{ session()->get('message') }}</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                @endif
+                                <div class="card-header d-flex align-items-center">
+                                    <h5 class="card-title mb-0 flex-grow-1">Edit Image</h5>
+                                    <div>
+                                        <a href="/"> <button class="btn btn-success">Image List</button></a>
+                                    </div>
+                                </div>
+
+                                <!-- end card header -->
                                 <div class="card-body">
                                     @foreach($image as $i)
                                     @php
-                                    $iddata =  $i->user_id;
-                                    @endphp   
+                                    $iddata = $i->user_id;
+                                    @endphp
+
                                     <!-- $imageget =  {{$d1->{'avtar'} ?? '' }} -->
 
-                                    <form enctype="multipart/form-data" action="{{route('admin.image.update',['id' => $iddata])}}" method="POST" id="validate-me-plz"> 
+                                    <form enctype="multipart/form-data" action="{{route('admin.image.update',['id' => $iddata])}}" method="POST" id="validate-me-plz">
                                         @csrf
                                         <div class="row">
                                             <div class="col-md-6">
@@ -106,15 +112,15 @@
                                             <div class="col-md-6">
                                                 <div class="form-group mb-3">
                                                     <label class="control-label" for="input-name">Image</label>
-                                                    <input type="file" id="fileuploads" name="avtar[]" require value="" data-rule-required="true" data-msg-required="Please Select Atleast One.." accept=".jpg, .jpeg, .png,.pdf" multiple class="form-control image" />
+                                                    <input type="file" id="fileuploads" name="avtar[]" require value="" accept="image/png, image/jpeg" data-rule-required="true" data-msg-required="Please Select Atleast One.." accept=".jpg, .jpeg, .png,.pdf" multiple class="form-control image" />
                                                 </div>
                                             </div>
-                                          
+
                                             <div class="col-md-6">
                                                 <label class="control-label" for="input-status">Status of Image</label>
                                                 <div class="form-group mb-3">
-                                                    <input type="radio" name="status" value="1" placeholder="Status" id="input-status" checked="checked"> 
-                                                    <label class="control-label"  for="input-status">Active</label>
+                                                    <input type="radio" name="status" value="1" placeholder="Status" id="input-status" checked="checked">
+                                                    <label class="control-label" for="input-status">Active</label>
                                                     <input type="radio" name="status" value="0" placeholder="Status" id="input-status">
                                                     <label class="control-label" for="input-status">Inactive</label>
                                                 </div>
@@ -124,15 +130,36 @@
                                             @php
                                             $imagename = $d1->avtar ?? '';
                                             @endphp
+                                            @php
+                                            $extension = pathinfo(storage_path($imagename), PATHINFO_EXTENSION);
+                                            // print_r($extension);
+                                            @endphp
                                             @if($imagename)
-                                            <div class="image-area">
-                                                <img src="{{ URL::asset('/images/' . $imagename) }}" alt="{{ $imagename }}"  />
-                                                <a class="remove-image " id="bksv" data-id="{{$i1['id']}}" style="display: inline;">&#215;</a>
+                                            @if ($extension == 'png')
+                                            <div class="image-area ">
+                                                <img src="{{ URL::asset('/images/' . $imagename) }}" alt="{{ $imagename }}" />
+                                                <a class="remove-image " id="bksv" data-id="{{$i1['id']}}" style="display: inline;" data-toggle="tooltip" data-placement="top" title="Remove Image"> &#215;</a>
                                             </div>
+                                            @elseif($extension == 'jpg')
+                                            <div class="image-area">
+                                                <img src="{{ URL::asset('/images/' . $imagename) }}" alt="{{ $imagename }}" />
+                                                <a class="remove-image " id="bksv" data-id="{{$i1['id']}}" style="display: inline;" data-toggle="tooltip" data-placement="top" title="Remove Image">&#215;</a>
+                                            </div>
+                                            @elseif($extension == 'jpeg')
+                                            <div class="image-area">
+                                                <img src="{{ URL::asset('/images/' . $imagename) }}" alt="{{ $imagename }}" />
+                                                <a class="remove-image " id="bksv" data-id="{{$i1['id']}}" style="display: inline;" data-toggle="tooltip" data-placement="top" title="Remove Image">&#215;</a>
+                                            </div>
+                                            @else
+                                            <div class="image-area">
+                                                <img src="{{ URL::asset('/images/' . $imagename) }}" alt="{{ $imagename }}" />
+                                                <a class="remove-image " id="bksv" data-id="{{$i1['id']}}" style="display: inline;" data-toggle="tooltip" data-placement="top" title="Remove Pdf">&#215;</a>
+                                            </div>
+                                            @endif
                                             @endif
                                             @endforeach
                                             @endforeach
-                                            <input type="hidden" value="{{$iddata}}" name = "id">
+                                            <input type="hidden" value="{{$iddata}}" name="id">
                                             <div class="col-lg-12">
                                                 <div class="text-end">
                                                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -155,23 +182,26 @@
         </div> <!-- container-fluid -->
     </div>
     <script>
-   
-   $(document).ready(function() {
-            $("#bksv").click(function(e) {
+        $(document).ready(function() {
+            $(".remove-image").click(function(e) {
                 let id = $(this).attr('data-id')
-                $.ajax({
-                    url: "/image-remove",
-                    type: 'GET',
-                    data: {
-                        'id': id
-                    },
-                    success:function(response){
-                        console.log(response);
-                    }
-                })
+                var html = $(this).closest('.image-area');
+                var x = confirm("Are you sure you want to delete?");
+                if (x)
+                    $.ajax({
+                        url: "/image-remove",
+                        type: 'GET',
+                        data: {
+                            'id': id
+                        },
+                        success: function(data)  {
+                            html.remove();
+                            $('.alert-success').html(data[0]);
+                        },
+                        
+                    })
             });
         });
-   
     </script>
 
 
@@ -211,7 +241,7 @@
                     arrayUploadImage.push(response);
                     console.log(arrayUploadImage);
                     tempImagePreview(arrayUploadImage);
-                    //         //     // onload: (response) => { arrayUploadImage.push(response); $('#overlay').fadeIn(); $('.image').val(response); console.log(arrayUploadImage); tempImagePreview(arrayUploadImage);  },
+                    // onload: (response) => { arrayUploadImage.push(response); $('#overlay').fadeIn(); $('.image').val(response); console.log(arrayUploadImage); tempImagePreview(arrayUploadImage);  },
                 },
 
             }
