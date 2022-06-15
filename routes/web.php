@@ -24,6 +24,8 @@ Route::post('/delete-upload',[\App\Http\Controllers\Admin\HomeController::class,
 
 ///////////////////////it is for delete image
 Route::delete('/delete-image/{id}',[\App\Http\Controllers\Admin\HomeController::class,'delete'])->name('admin.image.delete');
+Route::Get('/delete-all-image',[\App\Http\Controllers\Admin\HomeController::class,'delete_all'])->name('admin.image.delete.all');
+
 
 Route::get('/image-edit/{id}',[\App\Http\Controllers\Admin\HomeController::class,'edit'])->name('admin.image.edit');
 Route::post('/image-edit/{id}',[\App\Http\Controllers\Admin\HomeController::class,'update'])->name('admin.image.update');
@@ -31,3 +33,6 @@ Route::get('/image-remove',[\App\Http\Controllers\Admin\HomeController::class,'r
 
 /////////////////it is for status of image 
 Route::post('/image/status/{id}', [\App\Http\Controllers\Admin\HomeController::class,'status'])->name('admin.image.status');
+Route::get('/image/status/activate_all', [\App\Http\Controllers\Admin\HomeController::class,'status_activate'])->name('admin.image.status.activate');
+
+Route::get('/image/status/inactivate_all', [\App\Http\Controllers\Admin\HomeController::class,'status_inactivate'])->name('admin.image.status.inactivate');

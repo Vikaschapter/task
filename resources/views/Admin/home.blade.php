@@ -2,7 +2,13 @@
     @section('content')
     <div class="page-content">
         <div class="container-fluid">
-
+    <style>
+        	.success{
+                background: green;
+            }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
             <!-- start page title -->
             <div class="row">
                 <div class="col-12">
@@ -41,15 +47,26 @@
                         <div class="card-header align-items-center d-flex">
                             <h4 class="card-title mb-0 flex-grow-1">Image Info</h4>
                             <a href="{{route('admin.image.create')}}"><button class="btn btn-success ">Create Image</button></a>
-                            
+                            <!-- <a style="margin: 5px;" class="btn btn-outline-danger delete-all" data-url="">Delete All</a>  -->
                         </div><!-- end card header -->
                         <div class="card-body">
                             <div class="live-preview">
                                 <div class="table-responsive table-card">
                                     <table class="table align-middle table-nowrap mb-0">
-                                        <thead class="table-light">
+                                        <thead class="table-light" >
                                             <tr>
-                                                <!-- <th scope="col"><input type="checkbox"></th> -->
+                                                <th scope="col">
+                                                <div class="input-group">
+                                                   
+                                                        <button class="btn btn-success  dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Action</button>
+                                                        <ul class="dropdown-menu dropdown-menu-end" >
+                                                            <li>   <a  class="dropdown-item delete-all" href data-id="">Delete All</a></li>
+                                                            <li>   <a  class="dropdown-item activate-all" href value="1">Activate All</a></li>
+                                                            <li>   <a  class="dropdown-item inactivate-all" href value="0">Inactivate All</a></li>
+                                                        </ul>
+                                                        <input type="checkbox" id="check_all" style="margin-left: 20px;"/> 
+                                                    </div>        
+                                            </th>
                                                 <th scope="col">ID</th>
                                                 <th scope="col">Title</th>
                                                 <th scope="col">Image</th>
@@ -61,8 +78,8 @@
 
                                             @foreach($data as $d)
                                             @foreach($d as $d1)
-                                            <tr>
-                                                <!-- <td><input type="checkbox" class="someid_1" value="{{$d1['user_id']}}" /></td> -->
+                                            <tr style="text-align: center;">
+                                                <td><input type="checkbox" class="checkbox" id="checkbox" value="{{$d1['user_id']}}" data-id="{{$d1['user_id']}}"/></td>
                                                 <td>{{$d1['user_id']}}</td>
                                                 <td>{{$d1['title']}}</td>
 
@@ -78,16 +95,16 @@
                                                     // print_r($extension);
                                                     @endphp
                                                     @if ($extension == 'png')
-                                                    <a href="{{URL::asset('/images/'.$imageget)}}"> <img src="{{URL::asset('/images/'.$imageget)}}" alt="{{$imageget}}" height="40px" width="70px" class="img-fluid d-block" data-min="2" data-toggle="tooltip" data-placement="top" title="View Image" style="margin-right: 10px;" />
+                                                    <a href="{{URL::asset('/images/'.$imageget)}}" target="_blank"> <img src="{{URL::asset('/images/'.$imageget)}}" alt="{{$imageget}}" height="40px" width="70px" class="img-fluid d-block" data-min="2" data-toggle="tooltip" data-placement="top" title="View Image" style="margin-right: 10px;" />
                                                     </a>
                                                     @elseif($extension == 'jpg')
-                                                    <a href="{{URL::asset('/images/'.$imageget)}}"><img src="{{URL::asset('/images/'.$imageget)}}" alt="{{$imageget}}" height="40px" width="70px" class="img-fluid d-block" data-toggle="tooltip" data-placement="top" title="View Image" style="margin-right: 10px;" />
+                                                    <a href="{{URL::asset('/images/'.$imageget)}}" target="_blank"><img src="{{URL::asset('/images/'.$imageget)}}" alt="{{$imageget}}" height="40px" width="70px" class="img-fluid d-block" data-toggle="tooltip" data-placement="top" title="View Image" style="margin-right: 10px;" />
                                                     </a>
                                                     @elseif($extension == 'jpeg')
-                                                    <a href="{{URL::asset('/images/'.$imageget)}}"><img src="{{URL::asset('/images/'.$imageget)}}" alt="{{$imageget}}" height="40px" width="70px" class="img-fluid d-block" data-toggle="tooltip" data-placement="top" title="View Image" style="margin-right: 10px;" />
+                                                    <a href="{{URL::asset('/images/'.$imageget)}}" target="_blank"><img src="{{URL::asset('/images/'.$imageget)}}" alt="{{$imageget}}" height="40px" width="70px" class="img-fluid d-block" data-toggle="tooltip" data-placement="top" title="View Image" style="margin-right: 10px;" />
                                                     </a>
                                                     @else
-                                                    <a href="{{URL::asset('/images/'.$imageget)}}" data-toggle="tooltip" data-placement="top" title="View Pdf"> <i class="bx bxs-file-pdf" style="font-size:30px"></i></a>
+                                                    <a href="{{URL::asset('/images/'.$imageget)}}" target="_blank" data-toggle="tooltip" data-placement="top" title="View Pdf"> <i class="bx bxs-file-pdf" style="font-size:30px"></i></a>
                                                     @endif
                                                     @endforeach
                                                 </td>
@@ -122,7 +139,7 @@
                                     </table>
                                 </div>
                             </div>
-
+                          
                         </div><!-- end card-body -->
                     </div><!-- end card -->
                 </div><!-- end col -->
@@ -131,12 +148,170 @@
         </div>
         <!-- container-fluid -->
     </div>
+    <script type="text/javascript">
+                $(document).ready(function() {
+                    // console.log( "ready!" );
+                    $('#check_all').on('click', function(e) {
+                        if ($(this).is(':checked', true)) {
+                            $(".checkbox").prop('checked', true);
+                        } else {
+                            $(".checkbox").prop('checked', false);
+                        }
+                    });
+
+                    $('.checkbox').on('click', function() {
+                        if ($('.checkbox:checked').length == $('.checkbox').length) {
+                            $('#check_all').prop('checked', true);
+                        } else {
+                            $('#check_all').prop('checked', false);
+                        }
+                    });
+                    $('.delete-all').on('click', function(e) {
+                        var idsArr = [];
+                        $(".checkbox:checked").each(function() {
+                            idsArr.push($(this).attr('data-id'));
+                            
+                        });
+                        if (idsArr.length <= 0) {
+                            alert("Please select atleast one record to delete.");
+                        } else {
+                            if (confirm("Are you sure, you want to delete the selected Image?")) {
+                                var strIds = idsArr.join(",");
+                                $.ajax({
+                                    url: "{{route('admin.image.delete.all')}}",
+                                    type: 'GET',
+                                    headers: {
+                                        '_token': '{!! csrf_token() !!}',
+                                    },
+                                    data: 'ids=' + strIds,
+                                    success: function(data) {
+                                        if (data['status'] == true) {
+                                            $(".checkbox:checked").each(function() {
+                                                $(this).parents("tr").remove();
+                                            });
+                                            // alert(data['message']);
+                                            toastr.options.timeOut = 15000; // 1.5s
+                                            toastr.error('Image Deleted  successfully!');
+                                        } else {
+                                            alert('Whoops Something went wrong!!');
+                                        }
+                                    },
+                                    error: function(data) {
+                                        alert(data.responseText);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    $('.activate-all').on('click', function(e) {
+                        var idsArr = [];
+                        $(".checkbox:checked").each(function() {
+                            // alert($(this).attr('value'));
+                            idsArr.push($(this).attr('data-id'));
+                        });
+                        if (idsArr.length <= 0) {
+                            alert("Please select atleast one record to activate.");
+                        } else {
+                            if (confirm("Are you sure, you want to activate the selected Image?")) {
+                                var strIds = idsArr.join(",");
+                                $.ajax({
+                                    url: "{{route('admin.image.status.activate')}}",
+                                    type: 'GET',
+                                    headers: {
+                                        '_token': '{!! csrf_token() !!}',
+                                    },
+                                    data: 'ids=' + strIds,
+                                    success: function(data) {
+                                        if (data['status'] == true) {
+                                            $(".checkbox:checked").each(function() {
+                                                $(this).parents("tr").remove();
+                                            });
+                                            alert(data['message']);
+                                            toastr.options.timeOut = 15000; // 1.5s
+                                            toastr.success('Image Activated successfully!');
+                                        } else {
+                                            alert('Whoops Something went wrong!!');
+                                        }
+                                    },
+                                    error: function(data) {
+                                        alert(data.responseText);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    $('.inactivate-all').on('click', function(e) {
+                        var idsArr = [];
+                        $(".checkbox:checked").each(function() {
+                            // alert($(this).attr('value'))
+                            idsArr.push($(this).attr('data-id'));
+                        });
+                        if (idsArr.length <= 0) {
+                            alert("Please select atleast one record to Inactivate.");
+                        } else {
+                            if (confirm("Are you sure, you want to Inactivate the selected Image?")) {
+                                var strIds = idsArr.join(",");
+                                $.ajax({
+                                    url: "{{route('admin.image.status.inactivate')}}",
+                                    type: 'GET',
+                                    headers: {
+                                        '_token': '{!! csrf_token() !!}',
+                                    },
+                                    data: 'ids=' + strIds,
+                                    success: function(data) {
+                                        if (data['status'] == true) {
+                                            $(".checkbox:checked").each(function() {
+                                                $(this).parents("tr").remove();
+                                            });
+                                            alert(data['message']);
+                                            toastr.options.timeOut = 15000; // 1.5s
+                                            toastr.success('Image Inactivated successfully!');
+                                        } else {
+                                            alert('Whoops Something went wrong!!');
+                                        }
+                                    },
+                                    error: function(data) {
+                                        alert(data.responseText);
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                    $('[data-toggle=confirmation]').confirmation({
+                        rootSelector: '[data-toggle=confirmation]',
+                        onConfirm: function(event, element) {
+                            element.closest('form').submit();
+                        }
+                    });
+                });
+            </script>
+<script type="text/javascript">
+	// Default Configuration
+		$(document).ready(function() {
+			toastr.options = {
+				'closeButton': true,
+				'debug': false,
+				'newestOnTop': false,
+				'progressBar': false,
+				'positionClass': 'toast-top-right',
+				'preventDuplicates': false,
+				'showDuration': '100000',
+				'hideDuration': '100000',
+				'timeOut': '500000',
+				'extendedTimeOut': '100000',
+
+				'showEasing': 'swing',
+				'hideEasing': 'linear',
+				'showMethod': 'fadeIn',
+				'hideMethod': 'fadeOut',
+			}
+		});
+</script>
 
     <script>
-      
-        const myTimeout = setTimeout(myGreeting, 5000);
-
-        function myGreeting() {
+       const myTimeout = setTimeout(myGreeting, 5000);
+         function myGreeting() {
             $("#mybutton").trigger("click");
         }
     </script>

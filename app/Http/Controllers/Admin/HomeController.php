@@ -51,10 +51,12 @@ class HomeController extends Controller
             'title' => 'required|string',
             'avtar' => 'required',
             'status' => 'required|boolean',
-        ]);
+        ],
+        [ 'avtar.required' => 'Please Select Atleast One Image.']
+    );
 
         if ($validation->fails()) {
-            return back()->withErrors($validation->errors());
+            return back()->withInput()->withErrors($validation->errors());
         }
 
         for ($i = 0; $i < count($request->avtar); $i++) {
@@ -154,6 +156,31 @@ class HomeController extends Controller
         return response()->json(["Image Deleted Succesfull"]);
     }
 
+    public function delete_all(Request $request)
+    {
+        $ids = $request->ids;
+        Image::whereIn('user_id', explode(",", $ids))->delete();
+        return response()->json(['status' => true, 'message' => "Users deleted successfully."]);
+    }
+
+    public function status_activate(Request $request)
+    {
+       
+        $ids = $request->ids;
+         $status =   Image::where('user_id', explode(",", $ids));
+         $statuss = $status ? '1' : '0';
+        $status->update(['status'=>$statuss]);
+        return response()->json(['status' => true, 'message' => "Image Activate successfully."]);
+    }
+    public function status_inactivate(Request $request)
+    {
+        $ids = $request->ids;
+        $status =   Image::where('user_id', explode(",", $ids));
+        $statuss = $status ? '0' : '1';
+        $status->update(['status'=>$statuss]);
+        return response()->json(['status' => true, 'message' => "Image Inactivate successfully."]);
+    }
+
     public function status($id)
     { 
       $status =  Image::where('user_id',$id)->first()->status;
@@ -167,6 +194,7 @@ class HomeController extends Controller
         //   return $request->all();
         $validation = Validator::make($request->all(), [
             'title' => 'required|string',
+            
             'status' => 'required|boolean',
         ]);
 

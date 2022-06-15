@@ -89,24 +89,15 @@
                                     </div>
                                     @endif
                                         
-                                    @if (isset($image->id))
-                                    <form action="{{ route('admin.image.update', ['id' => $image->id]) }}" id="validate-me-plz" method="post" enctype="multipart/form-data">
-                                        @else
+                                   
                                         <form enctype="multipart/form-data" action="{{ route('admin.image.store') }}" method="POST" id="validate-me-plz">
-                                            @endif
+                                           
                                             @csrf
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group mb-3">
                                                         <label class="control-label" for="title">Title</label>
-                                                        @if (isset($image->id))
-                                                        <input type="text" name="title" id="name" placeholder="Image Title" class="form-control" data-rule-required="true" data-rule-minlength="2" data-msg-required="Please enter Title." value="{{ $image->title }}">
-                                                        @error('title')
-                                                        <div class="alert alert-danger">{{ $message }}</div>
-                                                        @enderror
-                                                        @else
-                                                        <input type="text" name="title" id="name" placeholder="Image Title" class="form-control" data-rule-required="true" data-rule-minlength="2" data-msg-required="Please enter Title.">
-                                                        @endif
+                                                        <input type="text" name="title" value="{{old('title')}}" id="name" placeholder="Image Title" class="form-control" data-rule-required="true" data-rule-minlength="2" data-msg-required="Please enter Title.">
                                                         @error('title')
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                         @enderror
@@ -118,29 +109,9 @@
                                                     <div class="form-group mb-3">
                                                         <label class="control-label" for="input-name">Image</label>
                                                         <div class="field" align="left">
-                                                            @if (isset($image->id))
-                                                            <input type="file" id="fileuploads" name="avtar[]" require value="" data-rule-required="true" data-msg-required="Please Select Atleast One.." accept=".jpg, .jpeg, .png,.pdf" multiple class="form-control image" value="{{ $image->image }}" />
-                                                            <br>
-
-                                                            <?php
-                                                            $img = $image['image'];
-
-                                                            $imageconvert = json_encode(json_decode($img)[0]->avtar);
-                                                            $imageget = str_replace('"', '', $imageconvert);
-                                                            ?>
-                                                            <div class="image-area">
-                                                                <img src="{{ URL::asset('/images/' . $imageget) }}" alt="{{ $imageget }}" height="80px" width="80px" />
-                                                                <a class="remove-image " id="bksv" data-id="{{$image['id']}}" style="display: inline;">&#215;</a>
-                                                            </div>
-                                                            @error('image')
-                                                            <div class="alert alert-danger">{{ $message }}</div>
-                                                            @enderror
-                                                            @else
-                                                            <input type="file" id="fileuploads" name="avtar[]" require value="" data-rule-required="true" data-msg-required="Please Select Atleast One.." accept=".jpg, .jpeg, .png,.pdf" multiple class="form-control image" />
-                                                            @endif
+                                                            <input type="file" id="fileuploads" name="avtar[]"  data-rule-required="true" data-msg-required="Please Select Atleast One.." accept=".jpeg,.jpg,.gif,.png" multiple class="form-control image" />
                                                         </div>
-
-                                                        @error('image')
+                                                        @error('avtar')
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                         @enderror
                                                     </div>
@@ -151,9 +122,9 @@
                                                     <label class="control-label" for="input-status">Status of
                                                         Image</label>
                                                     <div class="form-group mb-3">
-                                                        <input type="radio" name="status" value="1" placeholder="Status" id="input-status" checked="checked">
+                                                        <input type="radio" name="status" value="1 {{ (! empty(old('status')) ? 'checked' : '') }}" placeholder="Status" id="input-status" checked="checked">
                                                         <label class="control-label" for="input-status">Active</label>
-                                                        <input type="radio" name="status" value="0" placeholder="Status" id="imgInp">
+                                                        <input type="radio" name="status" value="0 {{ (! empty(old('status')) ? 'checked' : '') }}" placeholder="Status" id="imgInp">
                                                         <label class="control-label" for="input-status">Inactive</label>
                                                         @error('stathhbus')
                                                         <div class="alert alert-danger">{{ $message }}</div>
@@ -181,6 +152,7 @@
         </div> <!-- container-fluid -->
     </div>
     <script>
+        function old($key = null, $default = null)
         $(document).ready(function() {
             $("#bksv").click(function(e) {
                 let id = $(this).attr('data-id')
@@ -217,6 +189,7 @@
         // Select the file input and use create() to turn it into a pond
         const pondElement = document.querySelector('input[name="avtar[]"]');
         const pond = FilePond.create(pondElement);
+                
 
         FilePond.setOptions({
             server: {
